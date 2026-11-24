@@ -1,4 +1,6 @@
 import Link from "next/link";
+import WatchlistButton from "../../../components/WatchlistButton";
+import MovieComments from "../../../components/MovieComments";
 
 export const dynamic = "force-dynamic";
 
@@ -62,10 +64,18 @@ export default async function MoviePage({ params }: { params: Promise<{ id: stri
         )}
         <div className="flex-1">
           <h1 className="text-4xl md:text-5xl font-bold mb-3 text-neutral-100">{movie.title}</h1>
-          <p className="text-neutral-400 mb-6 text-sm md:text-base">
+          <p className="text-neutral-400 mb-5 text-sm md:text-base">
             {movie.release_date?.split("-")[0]} • {movie.runtime ? `${movie.runtime} dakika` : "Süre belirtilmedi"} • 
             <span className="text-yellow-500 ml-2">★ {movie.vote_average?.toFixed(1)}/10</span>
           </p>
+
+          <div className="mb-8">
+            <WatchlistButton
+              movieId={movie.id}
+              movieTitle={movie.title}
+              posterPath={movie.poster_path}
+            />
+          </div>
 
           <h2 className="text-xl font-semibold mb-3 text-neutral-200">Özet</h2>
           <p className="text-neutral-300 leading-relaxed mb-8 text-lg">
@@ -111,21 +121,7 @@ export default async function MoviePage({ params }: { params: Promise<{ id: stri
         </div>
       )}
 
-      <div className="mt-16 border-t border-neutral-800 pt-10">
-        <h2 className="text-2xl font-bold mb-6 text-neutral-200">Yorumlar</h2>
-        <div className="bg-neutral-900 p-6 rounded-xl border border-neutral-800 max-w-4xl mx-auto">
-          <textarea
-            placeholder="Bu film hakkında ne düşünüyorsun?"
-            className="w-full bg-neutral-950 p-4 rounded-lg text-white resize-none border border-neutral-800 focus:outline-none focus:border-neutral-500 transition-colors"
-            rows={4}
-          ></textarea>
-          <div className="flex justify-end mt-4">
-            <button className="bg-white text-black hover:bg-neutral-200 px-6 py-2 rounded-lg text-sm font-semibold transition-colors">
-              Yorum Gönder
-            </button>
-          </div>
-        </div>
-      </div>
+      <MovieComments movieId={movie.id} />
     </main>
   );
 }

@@ -5,8 +5,7 @@ export const dynamic = "force-dynamic";
 async function getMovieDetails(id: string) {
   const apiKey = process.env.TMDB_API_KEY;
   const baseUrl = process.env.TMDB_BASE_URL || "https://api.themoviedb.org/3";
-  
-  // Detayları, oyuncuları ve fragmanı tek seferde çekiyoruz
+
   const res = await fetch(
     `${baseUrl}/movie/${id}?api_key=${apiKey}&language=tr-TR&append_to_response=credits,videos`,
     { cache: "no-store" }
@@ -16,8 +15,9 @@ async function getMovieDetails(id: string) {
   return res.json();
 }
 
-export default async function MoviePage({ params }: { params: { id: string } }) {
-  const movie = await getMovieDetails(params.id);
+export default async function MoviePage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const movie = await getMovieDetails(id);
 
   if (!movie) {
     return (
@@ -28,7 +28,6 @@ export default async function MoviePage({ params }: { params: { id: string } }) 
     );
   }
 
-  // YouTube fragmanını filtrele
   const trailer = movie.videos?.results?.find(
     (v: any) => v.site === "YouTube" && (v.type === "Trailer" || v.type === "Teaser")
   );
@@ -38,8 +37,7 @@ export default async function MoviePage({ params }: { params: { id: string } }) 
       <Link href="/" className="text-sm text-neutral-400 hover:text-white mb-8 inline-block transition-colors">
         ← Ana Sayfaya Dön
       </Link>
-      
-      {/* Üst Kısım: Afiş ve Bilgiler */}
+
       <div className="flex flex-col md:flex-row gap-8 lg:gap-12">
         {movie.poster_path && (
           <img
@@ -54,13 +52,12 @@ export default async function MoviePage({ params }: { params: { id: string } }) 
             {movie.release_date?.split("-")[0]} • {movie.runtime ? `${movie.runtime} dakika` : "Süre belirtilmedi"} • 
             <span className="text-yellow-500 ml-2">★ {movie.vote_average?.toFixed(1)}/10</span>
           </p>
-          
+
           <h2 className="text-xl font-semibold mb-3 text-neutral-200">Özet</h2>
           <p className="text-neutral-300 leading-relaxed mb-8 text-lg">
             {movie.overview || "Bu film için Türkçe özet henüz eklenmedi."}
           </p>
 
-          {/* Oyuncular */}
           {movie.credits?.cast?.length > 0 && (
             <div>
               <h2 className="text-xl font-semibold mb-4 text-neutral-200">Öne Çıkan Oyuncular</h2>
@@ -86,7 +83,6 @@ export default async function MoviePage({ params }: { params: { id: string } }) 
         </div>
       </div>
 
-      {/* Fragman Video */}
       {trailer && (
         <div className="mt-16 border-t border-neutral-800 pt-10">
           <h2 className="text-2xl font-bold mb-6 text-neutral-200">Fragman</h2>
@@ -101,7 +97,6 @@ export default async function MoviePage({ params }: { params: { id: string } }) 
         </div>
       )}
 
-      {/* Yorumlar Taslağı */}
       <div className="mt-16 border-t border-neutral-800 pt-10">
         <h2 className="text-2xl font-bold mb-6 text-neutral-200">Yorumlar</h2>
         <div className="bg-neutral-900 p-6 rounded-xl border border-neutral-800 max-w-4xl mx-auto">

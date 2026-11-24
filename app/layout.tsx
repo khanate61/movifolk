@@ -18,6 +18,9 @@ export const metadata: Metadata = {
     template: "%s | Movifolk",
   },
   description: "Filmleri keşfet, fragmanları izle ve yorumlarını paylaş.",
+  icons: {
+    icon: "/icon.webp",
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
